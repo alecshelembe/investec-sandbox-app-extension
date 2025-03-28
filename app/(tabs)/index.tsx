@@ -7,6 +7,8 @@ import { ThemedView } from '@/components/ThemedView';
 import ThemedButton from "@/components/ThemedButton";
 import MyAjaxButton from '@/components/MyAjaxButton'; // Adjust the path as needed
 import CameraButton from '@/components/CameraButton'; // Adjust the path as needed
+import PushNotificationButton from '@/components/PushNotificationButton'; // Adjust the path if needed
+import { View } from 'react-native';
 
 
 export default function HomeScreen() {
@@ -23,6 +25,13 @@ export default function HomeScreen() {
         <ThemedText type="title">Welcome Investec Developer!</ThemedText>
         <HelloWave />
       </ThemedView>
+       <View style={styles.container}>
+            <PushNotificationButton
+              title="Send Custom Notification"
+              notificationTitle="Important Update!"
+              notificationBody="A new feature is available. Check it out now!"
+            />
+          </View>
 
        {/* Add Button Here */}
                   <ThemedView style={styles.buttonContainer}>
