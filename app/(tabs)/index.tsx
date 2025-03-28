@@ -4,6 +4,8 @@ import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import ThemedButton from "@/components/ThemedButton";
+
 
 export default function HomeScreen() {
   return (
@@ -16,7 +18,7 @@ export default function HomeScreen() {
         />
       }>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
+        <ThemedText type="title">Welcome Investec Developer!</ThemedText>
         <HelloWave />
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
@@ -50,6 +52,12 @@ export default function HomeScreen() {
           <ThemedText type="defaultSemiBold">app-example</ThemedText>.
         </ThemedText>
       </ThemedView>
+
+        {/* Add Button Here */}
+            <ThemedView style={styles.buttonContainer}>
+              <ThemedButton title="Click Me!" theme="primary" onPress={() => alert("Button Pressed!")} />
+            </ThemedView>
+
     </ParallaxScrollView>
   );
 }
