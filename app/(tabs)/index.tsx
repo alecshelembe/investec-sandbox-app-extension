@@ -6,6 +6,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import ThemedButton from "@/components/ThemedButton";
 import MyAjaxButton from '@/components/MyAjaxButton'; // Adjust the path as needed
+import CameraButton from '@/components/CameraButton'; // Adjust the path as needed
 
 
 export default function HomeScreen() {
@@ -35,6 +36,9 @@ export default function HomeScreen() {
                  // data={{ key: 'value' }} // Optional data for POST/PUT requests
                />
              </ThemedView>
+      <CameraButton title="Take Picture" theme="primary" />
+
+
 
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Step 1: Try it</ThemedText>
