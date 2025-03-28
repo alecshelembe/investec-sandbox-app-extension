@@ -5,6 +5,7 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import ThemedButton from "@/components/ThemedButton";
+import MyAjaxButton from '@/components/MyAjaxButton'; // Adjust the path as needed
 
 
 export default function HomeScreen() {
@@ -21,6 +22,20 @@ export default function HomeScreen() {
         <ThemedText type="title">Welcome Investec Developer!</ThemedText>
         <HelloWave />
       </ThemedView>
+
+       {/* Add Button Here */}
+                  <ThemedView style={styles.buttonContainer}>
+                    <ThemedButton title="Get My location!" theme="primary" onPress={() => alert("Button Pressed!")} />
+                  </ThemedView>
+       {/* Add MyAjaxButton here */}
+             <ThemedView style={styles.ajaxButtonContainer}>
+               <MyAjaxButton
+                 url="https://jsonplaceholder.typicode.com/posts/1" // Replace with your API URL
+                 method="GET"
+                 // data={{ key: 'value' }} // Optional data for POST/PUT requests
+               />
+             </ThemedView>
+
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Step 1: Try it</ThemedText>
         <ThemedText>
@@ -52,12 +67,6 @@ export default function HomeScreen() {
           <ThemedText type="defaultSemiBold">app-example</ThemedText>.
         </ThemedText>
       </ThemedView>
-
-        {/* Add Button Here */}
-            <ThemedView style={styles.buttonContainer}>
-              <ThemedButton title="Click Me!" theme="primary" onPress={() => alert("Button Pressed!")} />
-            </ThemedView>
-
     </ParallaxScrollView>
   );
 }
