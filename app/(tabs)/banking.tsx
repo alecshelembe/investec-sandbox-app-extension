@@ -1,156 +1,155 @@
-import React, { useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Linking, Animated } from 'react-native';
+import React, { useRef, useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView } from 'react-native';
 
 interface LandingPageProps {
   accessToken?: string | null;
 }
 
 const LandingPage: React.FC<LandingPageProps> = ({ accessToken }) => {
-  const fadeAnim = useRef(new Animated.Value(0)).current; // Initial opacity 0
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const [token, setToken] = useState<string | null>(accessToken || null);
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 800,
-      useNativeDriver: true, // Improve performance
+      useNativeDriver: true,
     }).start();
   }, [fadeAnim]);
 
-  const handleLinkPress = (url: string) => {
-    Linking.openURL(url);
+  const requestAccessToken = async () => {
+    try {
+      const response = await fetch('https://investec-developer-project-repo.visitmyjoburg.co.za/authenticate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const data = await response.json();
+      setToken(data.access_token);
+    } catch (error) {
+      console.error('Error fetching access token:', error);
+    }
   };
 
   return (
-    <View style={styles.container}>
-      {/* Hero Section */}
-      <Animated.View style={[styles.hero, { opacity: fadeAnim, transform: [{ translateY: fadeAnim.interpolate({inputRange: [0, 1], outputRange: [20, 0]})}] }]}>
-        <Text style={styles.heroTitle}>Welcome Investec Developer</Text>
-        <Text style={styles.heroText}>Explore the best in coding with us and look around.</Text>
+    <ScrollView contentContainerStyle={styles.container}>
+      <View style={styles.spacer} />
+      <Animated.View style={[styles.hero, { opacity: fadeAnim }]}>
+        <Text style={styles.heroTitle}>Welcome to Investec Developer Portal</Text>
+        <Text style={styles.heroSubtitle}>Seamlessly interact with Investec APIs</Text>
       </Animated.View>
-
-      {accessToken ? (
-        // Access Token Section
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Access Token (Sandbox)</Text>
-          <View style={styles.tokenContainer}>
-            <Text style={styles.tokenLabel}>Your Access Token:</Text>
-            <Text style={styles.tokenText}>{accessToken}</Text>
-          </View>
-          <TouchableOpacity style={styles.button} onPress={() => handleLinkPress('/fetch-account-info')}>
-            <Text style={styles.buttonText}>Fetch Account Info</Text>
-          </TouchableOpacity>
-        </View>
-      ) : (
-        // No Token Available
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>No Access Token Available</Text>
-          <Text style={styles.sectionText}>Request a new access token by clicking below.</Text>
-          <TouchableOpacity style={styles.button} onPress={() => handleLinkPress('/authenticate')}>
-            <Text style={styles.buttonText}>Request Access Token</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-
-      {/* Help Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Help</Text>
-        <View style={styles.helpGrid}>
-          <TouchableOpacity style={styles.helpItem} onPress={() => handleLinkPress('https://github.com/alecshelembe/investec-developer-project-repo')}>
-            <Text style={styles.helpItemTitle}>Investec Developer Project Repo</Text>
-            <Text style={styles.helpItemText}>Explore the GitHub repository for the Investec Developer Project.</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.helpItem} onPress={() => handleLinkPress('https://developer.investec.com/za/api-products/documentation/SA_PB_Account_Information#section/Release-Notes')}>
-            <Text style={styles.helpItemTitle}>Investec API Documentation</Text>
-            <Text style={styles.helpItemText}>Check the API documentation for SA PB Account Information.</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.helpItem} onPress={() => handleLinkPress('https://github.com/Investec-Developer-Community')}>
-            <Text style={styles.helpItemTitle}>Investec Developer Community</Text>
-            <Text style={styles.helpItemText}>Join the Investec Developer Community for support and updates.</Text>
-          </TouchableOpacity>
-        </View>
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>API Access</Text>
+        {token ? (
+          <>
+            <Text style={styles.infoText}>Your Access Token:</Text>
+            <View style={styles.tokenContainer}>
+              <Text style={styles.tokenText}>{token}</Text>
+            </View>
+          </>
+        ) : (
+          <>
+            <Text style={styles.infoText}>No access token available.</Text>
+            <TouchableOpacity style={styles.button} onPress={requestAccessToken}>
+              <Text style={styles.buttonText}>Request Access Token</Text>
+            </TouchableOpacity>
+          </>
+        )}
       </View>
-    </View>
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>About This App</Text>
+        <Text style={styles.infoText}>This portal enables developers to securely interact with Investec’s API ecosystem.</Text>
+      </View>
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>Developer Resources</Text>
+        <TouchableOpacity style={styles.linkItem}>
+          <Text style={styles.linkText}>Project Repository</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.linkItem}>
+          <Text style={styles.linkText}>API Documentation</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.linkItem}>
+          <Text style={styles.linkText}>Developer Community</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#f0f0f0', // Light gray background
     padding: 20,
+    backgroundColor: '#f8f9fa',
+  },
+  spacer: {
+    height: 20,
   },
   hero: {
-    backgroundColor: 'linear-gradient(90deg, #2563eb, #1e40af)',
-    padding: 20,
     alignItems: 'center',
+    backgroundColor: '#1e40af',
+    padding: 30,
+    borderRadius: 10,
     marginBottom: 20,
   },
   heroTitle: {
     fontSize: 24,
     fontWeight: 'bold',
     color: 'white',
-    marginBottom: 10,
+    textAlign: 'center',
   },
-  heroText: {
+  heroSubtitle: {
     fontSize: 16,
     color: 'white',
-    opacity: 0.9,
+    textAlign: 'center',
+    marginTop: 5,
   },
-  section: {
-    marginBottom: 20,
+  card: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    marginBottom: 15,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 5,
   },
-  sectionTitle: {
-    fontSize: 20,
+  cardTitle: {
+    fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
   },
-  sectionText: {
+  infoText: {
     fontSize: 16,
     marginBottom: 10,
   },
   tokenContainer: {
-    backgroundColor: 'white',
+    backgroundColor: '#e0e7ff',
     padding: 10,
-    borderRadius: 8,
+    borderRadius: 5,
     marginBottom: 10,
   },
-  tokenLabel: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
   tokenText: {
-    fontSize: 12,
+    fontSize: 14,
+    color: '#333',
   },
   button: {
     backgroundColor: '#2563eb',
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
+    marginTop: 10,
   },
   buttonText: {
     color: 'white',
     fontSize: 16,
   },
-  helpGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+  linkItem: {
+    paddingVertical: 8,
   },
-  helpItem: {
-    backgroundColor: 'white',
-    width: '30%',
-    padding: 10,
-    borderRadius: 8,
-    marginBottom: 10,
-  },
-  helpItemTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  helpItemText: {
-    fontSize: 12,
+  linkText: {
+    fontSize: 16,
+    color: '#2563eb',
   },
 });
 
