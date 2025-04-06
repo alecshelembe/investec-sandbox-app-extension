@@ -2,9 +2,9 @@
 
 Hi, this repo is a cross platform react native app.
 
-![img.png](img.png)
-![img_1.png](img_1.png)
-
+![img_2.png](img_2.png)
+![img_3.png](img_3.png)
+![img_4.png](img_4.png)
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
