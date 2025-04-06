@@ -1,104 +1,171 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import React, { useRef, useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView } from 'react-native';
+import { useToken } from '../../TokenContext'; // make sure path is correct
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import ThemedButton from "@/components/ThemedButton";
-import MyAjaxButton from '@/components/MyAjaxButton'; // Adjust the path as needed
-import CameraButton from '@/components/CameraButton'; // Adjust the path as needed
-import PushNotificationButton from '@/components/PushNotificationButton'; // Adjust the path if needed
-import { View } from 'react-native';
+const LandingPage: React.FC = () => {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const { token, setToken } = useToken(); // use context here
+  const [isFetchingToken, setIsFetchingToken] = useState(false);
 
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 800,
+      useNativeDriver: true,
+    }).start();
+  }, []);
 
-export default function HomeScreen() {
+  const requestAccessToken = async () => {
+    if (isFetchingToken) {
+      return; // Prevent multiple presses
+    }
+
+    setIsFetchingToken(true);
+    try {
+      const response = await fetch('https://investec-developer-project-repo.visitmyjoburg.co.za/api/authenticate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const data = await response.json();
+      setToken(data.access_token); // set token in context
+    } catch (error) {
+      console.error('Error fetching access token:', error);
+      // Optionally reset loading state on error if you want to allow retry
+      // setIsFetchingToken(false);
+    } finally {
+      setIsFetchingToken(false);
+    }
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome Investec Developer!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-       <View style={styles.container}>
-            <PushNotificationButton
-              title="Send Custom Notification"
-              notificationTitle="Important Update!"
-              notificationBody="A new feature is available. Check it out now!"
-            />
-          </View>
-
-       {/* Add Button Here */}
-                  <ThemedView style={styles.buttonContainer}>
-                    <ThemedButton title="Get My location!" theme="primary" onPress={() => alert("Button Pressed!")} />
-                  </ThemedView>
-       {/* Add MyAjaxButton here */}
-             <ThemedView style={styles.ajaxButtonContainer}>
-               <MyAjaxButton
-                 url="https://jsonplaceholder.typicode.com/posts/1" // Replace with your API URL
-                 method="GET"
-                 // data={{ key: 'value' }} // Optional data for POST/PUT requests
-               />
-             </ThemedView>
-      <CameraButton title="Take Picture" theme="primary" />
-
-
-
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <ScrollView contentContainerStyle={styles.container}>
+      <View style={styles.spacer} />
+      <Animated.View style={[styles.hero, { opacity: fadeAnim }]}>
+        <Text style={styles.heroTitle}>Welcome to Investec Developer Portal</Text>
+        <Text style={styles.heroSubtitle}>Seamlessly interact with Investec APIs</Text>
+      </Animated.View>
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>API Access</Text>
+        {token ? (
+          <>
+            <Text style={styles.infoText}>Your Access Token:</Text>
+            <View style={styles.tokenContainer}>
+              <Text style={styles.tokenText}>{token}</Text>
+            </View>
+          </>
+        ) : (
+          <>
+            <Text style={styles.infoText}>No access token available.</Text>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={requestAccessToken}
+              disabled={isFetchingToken}
+            >
+              <Text style={styles.buttonText}>
+                {isFetchingToken ? 'Requesting Token...' : 'Request Access Token'}
+              </Text>
+            </TouchableOpacity>
+          </>
+        )}
+      </View>
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>About This App</Text>
+        <Text style={styles.infoText}>
+          This portal enables developers to securely interact with Investec’s API ecosystem.
+        </Text>
+      </View>
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>Developer Resources</Text>
+        <TouchableOpacity style={styles.linkItem}>
+          <Text style={styles.linkText}>Project Repository</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.linkItem}>
+          <Text style={styles.linkText}>API Documentation</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.linkItem}>
+          <Text style={styles.linkText}>Developer Community</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+  container: {
+    padding: 20,
+    backgroundColor: '#f8f9fa',
+  },
+  spacer: {
+    height: 20,
+  },
+  hero: {
     alignItems: 'center',
-    gap: 8,
+    backgroundColor: '#1e40af',
+    padding: 30,
+    borderRadius: 10,
+    marginBottom: 20,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  heroTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: 'white',
+    textAlign: 'center',
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  heroSubtitle: {
+    fontSize: 16,
+    color: 'white',
+    textAlign: 'center',
+    marginTop: 5,
+  },
+  card: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    marginBottom: 15,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 5,
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  infoText: {
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  tokenContainer: {
+    backgroundColor: '#e0e7ff',
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  tokenText: {
+    fontSize: 14,
+    color: '#333',
+  },
+  button: {
+    backgroundColor: '#2563eb',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+  },
+  linkItem: {
+    paddingVertical: 8,
+  },
+  linkText: {
+    fontSize: 16,
+    color: '#2563eb',
   },
 });
+
+export default LandingPage;
